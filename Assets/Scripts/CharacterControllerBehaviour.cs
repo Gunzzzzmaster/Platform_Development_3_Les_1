@@ -6,10 +6,16 @@ using UnityEngine.Assertions;
 [RequireComponent(typeof(CharacterController))] // Creates and adds a CharacterController Component if there is none
 public class CharacterControllerBehaviour : MonoBehaviour {
 
-    private CharacterController _characterController;
-    private Vector3 _velocity = Vector3.zero; // [m/s]
+    [SerializeField]
+    private Transform _absoluteTransform;
 
-	void Start () {
+    private CharacterController _characterController;
+
+    private Vector3 _velocity = Vector3.zero; // [m/s]
+    private Vector3 _inputMovement = Vector3.zero;
+
+	void Start()
+    {
         _characterController = GetComponent<CharacterController>();
 
 #if DEBUG
@@ -19,13 +25,47 @@ public class CharacterControllerBehaviour : MonoBehaviour {
 #endif
     }
 
-    void Update() {
+    void Update()
+    {
+        _inputMovement = new Vector3(Input.GetAxis("Horizontal"), 0, Input.GetAxis("Vertical"));
+    }
+
+    void FixedUpdate()
+    {
+        ApplyGround();
+
+        ApplyGravity();
+
+        ApplyMovement();
+
+        DoMovement();
+    }
+
+    private void ApplyGround()
+    {
+        if (_characterController.isGrounded)
+        {
+            _velocity -= Vector3.Project(_velocity, Physics.gravity);
+        }
+    }
+
+    private void ApplyGravity()
+    {
         if (!_characterController.isGrounded)
         {
-            _velocity += Physics.gravity * Time.deltaTime;
+            _velocity += Physics.gravity * Time.fixedDeltaTime; // in FixedUpdate(), deltaTime and fixedDeltaTime is the same
         }
-        Vector3 movement = _velocity * Time.deltaTime;
+    }
 
-        _characterController.Move(movement);
+    private void ApplyMovement()
+    {
+        
+    }
+
+    private void DoMovement()
+    {
+        Vector3 displacement = _velocity * Time.deltaTime;
+
+        _characterController.Move(displacement);
     }
 }
