@@ -1,16 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Assertions;
 
+[RequireComponent(typeof(CharacterController))] //Creates and adds a CharacterController Component if there is none
 public class CharacterControllerBehaviour : MonoBehaviour {
 
-	// Use this for initialization
+    private CharacterController _characterController;
+
 	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
+        _characterController = GetComponent<CharacterController>();
+
+#if DEBUG
+        //if (_characterController == null)
+        //    Debug.LogError("DEPENDENCY ERROR: CharacterControllerBehaviour needs a CharacterControllerComponent");
+        Assert.IsNotNull(_characterController, "DEPENDENCY ERROR: CharacterControllerBehaviour needs a CharacterControllerComponent");
+#endif
+    }
+
+    void Update () {
 		
 	}
 }
